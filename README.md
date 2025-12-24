@@ -1,14 +1,33 @@
-# 📝 Gestion de Tâches - Test Technique Laravel
+# 📝 ToDo App Laravel-style
 
-Application minimaliste de gestion de tâches développée en **PHP 8.1+** avec une architecture **Laravel-style**.
+![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel--style-FF2D20?logo=laravel&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
+
+> Application minimaliste de gestion de tâches développée en **PHP 8.1+** avec une architecture **Laravel-style**. Test technique réalisé en **< 2h**.
+
+[🚀 Demo](#installation-rapide) • [📚 Documentation](#stack-technique) • [🎯 Fonctionnalités](#-fonctionnalités)
+
+---
+
+## ✨ Highlights
+
+- **120 lignes de code** PHP total (ultra-concis)
+- **0 dépendance** externe (sauf Composer autoload)
+- **PHP 8.1+** moderne : Enum, Match, Typed properties
+- **Architecture MVC** Laravel-style
+- **SQLite** zero-config
+- **Bootstrap 5** responsive
 
 ## 🚀 Installation Rapide
 
 ```bash
-# Naviguer dans le dossier
-cd todo-app
+# Cloner le projet
+git clone https://github.com/Hardi99/todo-laravel-test.git
+cd todo-laravel-test
 
-# Installer les dépendances (juste l'autoload)
+# Installer (juste l'autoload)
 composer install
 
 # Initialiser la base de données
@@ -18,34 +37,36 @@ php database/migrate.php
 php -S localhost:8000 -t public
 ```
 
-Accéder à : **http://localhost:8000**
+**Ouvrir** : http://localhost:8000
 
-## ✨ Fonctionnalités
+## 🎯 Fonctionnalités
 
-- ✅ Lister les tâches (avec statut, dates)
-- ✅ Ajouter une nouvelle tâche
-- ✅ Marquer une tâche comme "terminée"
-- ✅ Supprimer une tâche
-- ✅ Interface responsive Bootstrap 5
-- ✅ Base de données SQLite
+| Feature | Status |
+|---------|--------|
+| 📋 Lister les tâches (avec statut, dates création/modification) | ✅ |
+| ➕ Ajouter une nouvelle tâche | ✅ |
+| ✓ Marquer une tâche comme "terminée" | ✅ |
+| 🗑️ Supprimer une tâche | ✅ |
+| 📱 Interface responsive | ✅ |
+| 🎨 Bootstrap 5 | ✅ |
 
 ## 🛠️ Stack Technique
 
-| Composant | Technologie |
-|-----------|-------------|
-| **Langage** | PHP 8.1+ (Enum, Match, Readonly) |
-| **Architecture** | MVC Laravel-style |
-| **Base de données** | SQLite + PDO |
-| **Frontend** | Bootstrap 5 + PHP natif |
-| **Routing** | Pattern matching moderne |
-| **ORM** | Active Record minimal |
+| Composant | Technologie | Pourquoi |
+|-----------|-------------|----------|
+| **Langage** | PHP 8.1+ | Enum, Match, Typed properties |
+| **Architecture** | MVC Laravel-style | Séparation des responsabilités |
+| **Base de données** | SQLite + PDO | Zero-config, portable |
+| **Frontend** | Bootstrap 5 | Responsive, moderne |
+| **Routing** | Pattern matching | Performances, simplicité |
+| **ORM** | Active Record | Eloquent-like API |
 
 ## 📁 Structure
 
 ```
 todo-app/
 ├── public/
-│   ├── index.php         # Entry point + Router
+│   ├── index.php         # Entry point + Router (Match expression)
 │   └── .htaccess         # URL rewriting
 ├── app/
 │   ├── Enums/
@@ -55,86 +76,125 @@ todo-app/
 │   └── Controllers/
 │       └── TaskController.php # CRUD logic
 ├── views/
-│   └── tasks.php         # Vue unique Bootstrap
+│   └── tasks.php         # Vue Bootstrap unique
 ├── database/
-│   ├── database.sqlite   # SQLite DB
+│   ├── database.sqlite   # SQLite DB (auto-créée)
 │   ├── init.sql          # Schema SQL
 │   └── migrate.php       # Migration script
 ├── composer.json         # Autoload PSR-4
 └── README.md
 ```
 
-## 🎯 Choix Techniques
+## 💡 Choix Techniques
 
-### Pourquoi cette approche ?
+### 🔹 Enum TaskStatus (PHP 8.1+)
 
-**Modernité** :
-- Enum PHP 8.1+ (type-safe pour les statuts)
-- Match expression au lieu de switch
-- Typed properties partout
-- Arrow functions pour le mapping
-
-**Efficacité** :
-- 0 dépendances externes (sauf autoload)
-- Routing ultra-rapide via pattern matching
-- SQLite = 0 configuration serveur
-- Active Record minimal (pas de couche ORM lourde)
-
-**Simplicité** :
-- 1 seule vue (tasks.php)
-- 1 seul controller
-- 1 seul model
-- ~300 lignes de code total
-
-### Améliorations possibles (avec plus de temps)
-
-**Court terme** :
-- Validation côté serveur (titre obligatoire, longueur max)
-- Édition des tâches existantes
-- Filtres par statut (tabs Bootstrap)
-- Messages flash de confirmation
-
-**Moyen terme** :
-- Vrai framework Laravel complet
-- API REST pour SPA/mobile
-- Authentification utilisateur
-- Tests PHPUnit
-
-**Long terme** :
-- Docker + Docker Compose
-- CI/CD GitHub Actions
-- Deploy Heroku/Vercel
-- Dates d'échéance + rappels
-
-## 🧪 Tests Manuels
-
-```bash
-# Tester l'autoload
-composer dump-autoload -o
-
-# Vérifier la BDD
-php -r "var_dump((new PDO('sqlite:database/database.sqlite'))->query('SELECT * FROM tasks')->fetchAll());"
-
-# Lancer les tests
-php -S localhost:8000 -t public
-# Ouvrir http://localhost:8000
-# Ajouter une tâche
-# La marquer comme terminée
-# La supprimer
+```php
+enum TaskStatus: string {
+    case TODO = 'à faire';
+    case IN_PROGRESS = 'en cours';
+    case DONE = 'terminée';
+    
+    public function badge(): string {
+        return match($this) {
+            self::TODO => 'secondary',
+            self::IN_PROGRESS => 'warning',
+            self::DONE => 'success',
+        };
+    }
+}
 ```
+
+**Avantages** : Type-safe, autocomplete IDE, méthodes personnalisées
+
+### 🔹 Match Expression (Router)
+
+```php
+match(true) {
+    $uri === '/' && $method === 'GET' => $controller->index(),
+    $uri === '/tasks' && $method === 'POST' => $controller->store(),
+    preg_match('#^/tasks/(\d+)/complete$#', $uri, $m) => $controller->complete((int)$m[1]),
+    default => http_response_code(404)
+};
+```
+
+**Avantages** : Concis, exhaustiveness check, return value
+
+### 🔹 Active Record Pattern
+
+```php
+// Créer
+$task = new Task(title: 'Test', status: TaskStatus::TODO);
+$task->save();
+
+// Lire
+$tasks = Task::all();
+$task = Task::find(1);
+
+// Supprimer
+$task->delete();
+```
+
+**Avantages** : API intuitive (Eloquent-like), pas d'ORM complexe
 
 ## 📊 Statistiques
 
-- **Lignes de code** : ~300
-- **Fichiers PHP** : 6
-- **Dépendances** : 0
-- **Temps de développement** : < 2h
+- **Lignes de code** : ~120 PHP
+- **Fichiers** : 7 fichiers PHP
+- **Dépendances** : 0 (sauf autoload)
+- **Temps de dev** : < 2h
 - **Compatible** : PHP 8.1+
+
+## 🧪 Tests
+
+```bash
+# Vérifier l'installation
+composer dump-autoload
+php database/migrate.php
+
+# Lancer l'app
+php -S localhost:8000 -t public
+
+# Tester manuellement
+# 1. Ajouter une tâche
+# 2. La marquer comme terminée
+# 3. La supprimer
+```
+
+## 🚀 Améliorations Possibles
+
+### Court terme
+- [ ] Validation côté serveur
+- [ ] Édition des tâches
+- [ ] Filtres par statut
+- [ ] Messages flash
+
+### Moyen terme
+- [ ] Framework Laravel complet
+- [ ] API REST
+- [ ] Tests PHPUnit
+- [ ] Authentification
+
+### Long terme
+- [ ] Docker + Docker Compose
+- [ ] CI/CD GitHub Actions
+- [ ] Deploy (Heroku/Vercel)
+- [ ] Frontend SPA (React/Vue)
 
 ## 👤 Auteur
 
-Test technique réalisé le 24/12/2025
+**Test technique** réalisé le 24/12/2025
 
 ---
 
-**Note** : Ce projet privilégie la **simplicité et l'efficacité** plutôt que la sur-engineering. C'est une preuve de concept démontrant la maîtrise de PHP moderne et des patterns MVC.
+## 📄 License
+
+MIT
+
+---
+
+<div align="center">
+
+**⭐ Si ce projet vous plaît, n'hésitez pas à le star !**
+
+</div>
